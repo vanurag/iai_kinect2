@@ -470,13 +470,16 @@ private:
     oss.str("");
     oss << "./" << std::setfill('0') << std::setw(4) << frame;
     const std::string baseName = oss.str();
-    const std::string cloudName = baseName + "_cloud.pcd";
+    const std::string cloudNameBinary = baseName + "_cloud_binary.pcd";
+    const std::string cloudNameAscii = baseName + "_cloud_ascii.pcd";
     const std::string colorName = baseName + "_color.jpg";
     const std::string depthName = baseName + "_depth.png";
     const std::string depthColoredName = baseName + "_depth_colored.png";
 
-    OUT_INFO("saving cloud: " << cloudName);
-    writer.writeBinary(cloudName, *cloud);
+    OUT_INFO("saving cloud: " << cloudNameBinary);
+    writer.writeBinary(cloudNameBinary, *cloud);
+    OUT_INFO("saving cloud: " << cloudNameAscii);
+    writer.writeASCII(cloudNameAscii, *cloud);
     OUT_INFO("saving color: " << colorName);
     cv::imwrite(colorName, color, params);
     OUT_INFO("saving depth: " << depthName);

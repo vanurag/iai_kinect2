@@ -1,0 +1,10 @@
+*.kdev4
+*.opensdf
+*.pdb
+*.sdf
+*.suo
+*.swp
+*.*~
+*.cproject
+*.project
+*.settings
