@@ -4,9 +4,11 @@
 
 - [Thiemo Wiedemeyer](https://ai.uni-bremen.de/team/thiemo_wiedemeyer) <<wiedemeyer@cs.uni-bremen.de>>, [Institute for Artificial Intelligence](http://ai.uni-bremen.de/), University of Bremen
 
+*Note:* ***Please use the GitHub issues*** *for questions and problems regarding the iai_kinect2 package and its components.* ***Do not write emails.***
+
 ## Description
 
-This tool uses OpenCV to calibrate two cameras to each other. It is specially designed for the Kinect  One. It uses chess or circle boards.
+This tool uses OpenCV to calibrate two cameras to each other. It is specially designed for the Kinect One. It uses chess or circle boards.
 
 ## Dependencies
 
@@ -23,8 +25,8 @@ kinect2_calibration [options]
   mode: 'record' or 'calibrate'
   source: 'color', 'ir', 'sync', 'depth'
   board:
-    'circle<WIDTH>x<HEIGHT>x<SIZE>'  for symmentric cirle grid
-    'acircle<WIDTH>x<HEIGHT>x<SIZE>' for asymmentric cirle grid
+    'circle<WIDTH>x<HEIGHT>x<SIZE>'  for symmetric circle grid
+    'acircle<WIDTH>x<HEIGHT>x<SIZE>' for asymmetric circle grid
     'chess<WIDTH>x<HEIGHT>x<SIZE>'   for chessboard pattern
   distortion model: 'rational' for using model with 8 instead of 5 coefficients
   output path: '-path <PATH>'
@@ -35,12 +37,12 @@ kinect2_calibration [options]
 Windows:
 - `ESC`, `q`: Quit
 - `SPACE`, `s`: Save the current image for calibration
-- `l`: decreas min and max value for IR value rage
-- `h`: increas min and max value for IR value rage
-- `1`: decreas min value for IR value rage
-- `2`: increas min value for IR value rage
-- `3`: decreas max value for IR value rage
-- `4`: increas max value for IR value rage
+- `l`: decrease min and max value for IR value rage
+- `h`: increase min and max value for IR value rage
+- `1`: decrease min value for IR value rage
+- `2`: increase min value for IR value rage
+- `3`: decrease max value for IR value rage
+- `4`: increase max value for IR value rage
 
 Terminal:
 - `CRTL`+`c`: Quit
@@ -53,8 +55,8 @@ Any chessboard pattern or symmetric or asymmetric circle grid should work. Three
 - [chess9x11x0.02.pdf](patterns/chess9x11x0.02.pdf)
 
 Other patterns are available at OpenCV:
-- [Chessboard pattern](http://docs.opencv.org/_downloads/pattern.png)
-- [Asymmetric circle grid](http://docs.opencv.org/_downloads/acircles_pattern.png)
+- [Chessboard pattern](http://docs.opencv.org/2.4.2/_downloads/pattern.png)
+- [Asymmetric circle grid](http://docs.opencv.org/2.4.2/_downloads/acircles_pattern.png)
 
 The standard board is a 7x6 0.108m chessboard from the PR2. But any other board can be specified with as parameter. For example a circle board with 8x7 circles in 0.02m distance between them `rosrun kinect2_calibration kinect2_calibration record color circle8x7x0.02`.
 

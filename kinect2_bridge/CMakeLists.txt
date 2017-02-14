@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(kinect2_bridge)
+project(kinect2_bridge CXX)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBT_USE_DOUBLE_PRECISION -Wall")
 # Unused warnings
@@ -19,9 +19,9 @@ ELSE()
   MESSAGE(ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 ENDIF()
 
-find_package(freenect2 REQUIRED)
+find_package(freenect2 REQUIRED HINTS "$ENV{HOME}/freenect2")
 
-find_package(catkin REQUIRED COMPONENTS roscpp rostime std_msgs sensor_msgs nodelet cv_bridge compressed_depth_image_transport kinect2_registration)
+find_package(catkin REQUIRED COMPONENTS roscpp rostime tf std_msgs sensor_msgs nodelet cv_bridge compressed_depth_image_transport kinect2_registration)
 
 ## System dependencies are found with CMake's conventions
 find_package(OpenCV REQUIRED)
@@ -61,7 +61,7 @@ add_custom_target(additional_files_${PROJECT_NAME}
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
   ${freenect2_INCLUDE_DIRS}
   ${kinect2_registration_INCLUDE_DIRS}
 )

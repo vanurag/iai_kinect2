@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(kinect2_viewer)
+project(kinect2_viewer CXX)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBT_USE_DOUBLE_PRECISION -Wall")
 # Unused warnings
@@ -64,7 +64,7 @@ add_custom_target(additional_files_${PROJECT_NAME}
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${kinect2_bridge_INCLUDE_DIRS}
 )

@@ -144,12 +144,12 @@ private:
     OUT_INFO("Controls:" << std::endl
              << FG_YELLOW "   [ESC, q]" NO_COLOR " - Exit" << std::endl
              << FG_YELLOW " [SPACE, s]" NO_COLOR " - Save current frame" << std::endl
-             << FG_YELLOW "        [l]" NO_COLOR " - decreas min and max value for IR value rage" << std::endl
-             << FG_YELLOW "        [h]" NO_COLOR " - increas min and max value for IR value rage" << std::endl
-             << FG_YELLOW "        [1]" NO_COLOR " - decreas min value for IR value rage" << std::endl
-             << FG_YELLOW "        [2]" NO_COLOR " - increas min value for IR value rage" << std::endl
-             << FG_YELLOW "        [3]" NO_COLOR " - decreas max value for IR value rage" << std::endl
-             << FG_YELLOW "        [4]" NO_COLOR " - increas max value for IR value rage");
+             << FG_YELLOW "        [l]" NO_COLOR " - decrease min and max value for IR value range" << std::endl
+             << FG_YELLOW "        [h]" NO_COLOR " - increase min and max value for IR value range" << std::endl
+             << FG_YELLOW "        [1]" NO_COLOR " - decrease min value for IR value range" << std::endl
+             << FG_YELLOW "        [2]" NO_COLOR " - increase min value for IR value range" << std::endl
+             << FG_YELLOW "        [3]" NO_COLOR " - decrease max value for IR value range" << std::endl
+             << FG_YELLOW "        [4]" NO_COLOR " - increase max value for IR value range");
 
     image_transport::TransportHints hints("compressed");
     subImageColor = new image_transport::SubscriberFilter(it, topicColor, 4, hints);
@@ -465,9 +465,9 @@ private:
 
   std::vector<cv::Point3f> board;
 
-  std::vector<std::vector<cv::Point3f>> pointsBoard;
-  std::vector<std::vector<cv::Point2f>> pointsColor;
-  std::vector<std::vector<cv::Point2f>> pointsIr;
+  std::vector<std::vector<cv::Point3f> > pointsBoard;
+  std::vector<std::vector<cv::Point2f> > pointsColor;
+  std::vector<std::vector<cv::Point2f> > pointsIr;
 
   cv::Size sizeColor;
   cv::Size sizeIr;
@@ -618,7 +618,7 @@ public:
   }
 
 private:
-  bool readFiles(const std::vector<std::string> &files, const std::string &ext, std::vector<std::vector<cv::Point2f>> &points) const
+  bool readFiles(const std::vector<std::string> &files, const std::string &ext, std::vector<std::vector<cv::Point2f> > &points) const
   {
     bool ret = true;
     #pragma omp parallel for
@@ -672,7 +672,7 @@ private:
     return true;
   }
 
-  void calibrateIntrinsics(const cv::Size &size, const std::vector<std::vector<cv::Point3f>> &pointsBoard, const std::vector<std::vector<cv::Point2f>> &points,
+  void calibrateIntrinsics(const cv::Size &size, const std::vector<std::vector<cv::Point3f> > &pointsBoard, const std::vector<std::vector<cv::Point2f> > &points,
                            cv::Mat &cameraMatrix, cv::Mat &distortion, cv::Mat &rotation, cv::Mat &projection, std::vector<cv::Mat> &rvecs, std::vector<cv::Mat> &tvecs)
   {
     if(points.empty())
@@ -715,9 +715,13 @@ private:
     OUT_INFO("Distortion Coeeficients Ir:" << std::endl << distortionIr << std::endl);
 
     OUT_INFO("calibrating Color and Ir extrinsics...");
+#if CV_MAJOR_VERSION == 2
     error = cv::stereoCalibrate(pointsBoard, pointsIr, pointsColor, cameraMatrixIr, distortionIr, cameraMatrixColor, distortionColor, sizeColor,
-                                rotation, translation, essential, fundamental, termCriteria,
-                                cv::CALIB_FIX_INTRINSIC);
+                                rotation, translation, essential, fundamental, termCriteria, cv::CALIB_FIX_INTRINSIC);
+#elif CV_MAJOR_VERSION == 3
+    error = cv::stereoCalibrate(pointsBoard, pointsIr, pointsColor, cameraMatrixIr, distortionIr, cameraMatrixColor, distortionColor, sizeColor,
+                                rotation, translation, essential, fundamental, cv::CALIB_FIX_INTRINSIC, termCriteria);
+#endif
     OUT_INFO("re-projection error: " << error << std::endl);
 
     OUT_INFO("Rotation:" << std::endl << rotation);
@@ -815,7 +819,7 @@ private:
   const std::string path;
 
   std::vector<cv::Point3f> board;
-  std::vector<std::vector<cv::Point2f>> points;
+  std::vector<std::vector<cv::Point2f> > points;
   std::vector<std::string> images;
 
   cv::Size size;
@@ -1047,7 +1051,11 @@ private:
   {
     cv::Mat rvec, rotation, translation;
     //cv::solvePnP(board, points[index], cameraMatrix, distortion, rvec, translation, false, cv::EPNP);
+#if CV_MAJOR_VERSION == 2
     cv::solvePnPRansac(board, points[index], cameraMatrix, distortion, rvec, translation, false, 300, 0.05, board.size(), cv::noArray(), cv::ITERATIVE);
+#elif CV_MAJOR_VERSION == 3
+    cv::solvePnPRansac(board, points[index], cameraMatrix, distortion, rvec, translation, false, 300, 0.05, 0.99, cv::noArray(), cv::SOLVEPNP_ITERATIVE);
+#endif
     cv::Rodrigues(rvec, rotation);
 
     normal = cv::Mat(3, 1, CV_64F);
@@ -1164,8 +1172,8 @@ void help(const std::string &path)
             << FG_GREEN "  mode" NO_COLOR ": " FG_YELLOW "'record'" NO_COLOR " or " FG_YELLOW "'calibrate'" << std::endl
             << FG_GREEN "  source" NO_COLOR ": " FG_YELLOW "'color'" NO_COLOR ", " FG_YELLOW "'ir'" NO_COLOR ", " FG_YELLOW "'sync'" NO_COLOR ", " FG_YELLOW "'depth'" << std::endl
             << FG_GREEN "  board" NO_COLOR ":" << std::endl
-            << FG_YELLOW "    'circle<WIDTH>x<HEIGHT>x<SIZE>'  " NO_COLOR "for symmentric cirle grid" << std::endl
-            << FG_YELLOW "    'acircle<WIDTH>x<HEIGHT>x<SIZE>' " NO_COLOR "for asymmentric cirle grid" << std::endl
+            << FG_YELLOW "    'circle<WIDTH>x<HEIGHT>x<SIZE>'  " NO_COLOR "for symmetric circle grid" << std::endl
+            << FG_YELLOW "    'acircle<WIDTH>x<HEIGHT>x<SIZE>' " NO_COLOR "for asymmetric circle grid" << std::endl
             << FG_YELLOW "    'chess<WIDTH>x<HEIGHT>x<SIZE>'   " NO_COLOR "for chessboard pattern" << std::endl
             << FG_GREEN "  distortion model" NO_COLOR ": " FG_YELLOW "'rational'" NO_COLOR " for using model with 8 instead of 5 coefficients" << std::endl
             << FG_GREEN "  output path" NO_COLOR ": " FG_YELLOW "'-path <PATH>'" NO_COLOR << std::endl;
@@ -1278,7 +1286,7 @@ int main(int argc, char **argv)
       boardSize = atof(arg.substr(rightX + 1, end - rightX + 1).c_str());
       boardDims = cv::Size(width, height);
     }
-    else if(arg == "-path" && argI + 1 < argc)
+    else if(arg == "-path" && ++argI < argc)
     {
       arg = argv[argI];
       struct stat fileStat;
