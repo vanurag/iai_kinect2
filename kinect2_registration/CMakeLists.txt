@@ -22,14 +22,16 @@ ENDIF()
 # additional cmake modules
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS roscpp eigen_catkin)
 find_package(cmake_modules QUIET)
 
 ## System dependencies are found with CMake's conventions
 find_package(OpenCV REQUIRED)
 find_package(OpenMP)
-find_package(Eigen3)
 find_package(OpenCL)
+find_package(eigen_catkin REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+add_definitions(${EIGEN3_DEFINITIONS})
 
 if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -39,15 +41,9 @@ endif()
 ## Check for modules being build based on found libraries ##
 ############################################################
 
-if(EIGEN3_FOUND)
-  message(STATUS "CPU based depth registration enabled")
-  include_directories(${EIGEN3_INCLUDE_DIR})
-  set(DEPTH_REG_CPU ON)
-  add_definitions(-DDEPTH_REG_CPU)
-else()
-  message(STATUS "CPU based depth registration disabled")
-  set(DEPTH_REG_CPU OFF)
-endif()
+message(STATUS "CPU based depth registration enabled")
+set(DEPTH_REG_CPU ON)
+add_definitions(-DDEPTH_REG_CPU)
 
 if(OpenCL_FOUND)
   message(STATUS "OpenCL based depth registration enabled")
